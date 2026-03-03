@@ -6,7 +6,7 @@
 </tr>
 </table>
 </div>
-
+    
 
 <div align="center">
 **A minimalist focus and productivity tracker.**
