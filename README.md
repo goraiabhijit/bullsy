@@ -1,21 +1,42 @@
-﻿# Bullsy
+﻿<div align="center">
 
-A minimalist focus and productivity tracker. Build daily habits, track your focus sessions, and stay consistent with streak tracking.
+# 🔥 Bullsy
 
-## Features
+**A minimalist focus and productivity tracker.**
+Build daily habits, track your focus sessions, and stay consistent.
 
-- **Count-up timer** - track open-ended focus sessions
-- **Pomodoro timer** - 25-minute sessions with 5-minute breaks and a visual progress ring
-- **Streak tracking** - daily streak with fire icon, resets if you miss a day
-- **Progress screen** - today's time, best day, lifetime total, current and longest streak
-- **Settings** - toggle seconds display, reset all stats
+</div>
 
-## Download
+---
 
-Coming soon on Google Play.
+## ✨ Features
 
-## Support
+| Feature | Description |
+|---|---|
+| ⏱️ Count-up Timer | Track open-ended focus sessions |
+| 🍅 Pomodoro Timer | 25-min sessions with 5-min breaks and a visual progress ring |
+| 🔥 Streak Tracking | Daily streak with fire icon — resets if you miss a day |
+| 📊 Progress Screen | Today's time, best day, lifetime total, current & longest streak |
+| ⚙️ Settings | Toggle seconds display, reset all stats |
 
-If you find this app useful, consider supporting:
+---
 
-☕ [buymeacoffee.com/gorai_abhijit_](https://buymeacoffee.com/gorai_abhijit_)
+## 📱 Download
+
+Coming soon on **Google Play**.
+
+---
+
+## 🙋 About
+
+Made by **Abhijit Gorai**
+
+---
+
+## ☕ Support
+
+If you find Bullsy useful, consider buying me a coffee!
+
+<a href="https://buymeacoffee.com/gorai_abhijit_" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50" />
+</a>
