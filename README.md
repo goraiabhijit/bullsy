@@ -1,9 +1,9 @@
 ﻿<div align="center">
 
-<h1>
-  <img src="./assets/images/icon.png" alt="icon" width="50" style="vertical-align: middle; border-radius: 12px;" />
-  &nbsp;Bullsy&nbsp;🔥
-</h1>
+<div style="display:flex; flex-direction:row; align-items:center; justify-content:center; gap:16px;">
+  <img src="./assets/images/icon.png" alt="Bullsy icon" width="80" style="border-radius: 20px;" />
+  <h1 style="margin:0;">Bullsy 🔥</h1>
+</div>
 
 **A minimalist focus and productivity tracker.**
 Build daily habits, track your focus sessions, and stay consistent.
