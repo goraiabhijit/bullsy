@@ -1,9 +1,11 @@
-﻿<img src="./assets/images/icon.png" alt="Bullsy icon" width="72" style="border-radius: 16px;" />
+﻿<table>
+<tr>
+<td><img src="./assets/images/icon.png" alt="Bullsy icon" width="72" style="border-radius: 16px;" /></td>
+<td><h1>Bullsy 🔥</h1></td>
+</tr>
+</table>
 
 <div align="center">
-
-# Bullsy 🔥
-
 **A minimalist focus and productivity tracker.**
 Build daily habits, track your focus sessions, and stay consistent.
 
