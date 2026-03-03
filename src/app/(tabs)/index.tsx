@@ -1,0 +1,233 @@
+import { useEffect, useState, useContext } from "react";
+import { AppProvider, AppContext } from "@/context/AppContext";
+import { Text, View, StyleSheet, Pressable } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Settings from "@/components/Settings";
+import Streak from "@/components/Streak";
+import { Ionicons } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
+import * as Haptics from "expo-haptics";
+
+export default function Index() {
+  // const [Time, setTime] = useState(new Date());
+
+  const { secondsOn } = useContext(AppContext);
+  const { value, setValue } = useContext(AppContext);
+  const [isTimerOn, setIsTimerOn] = useState(false);
+  const [Timer, setTimer] = useState(0);
+  const [hideStatus, sethideStatus] = useState(false);
+  const { hideStatusbar, sethideStatusbar } = useContext(AppContext);
+
+  const triggerHaptic = async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  };
+
+  useEffect(() => {
+    if (isTimerOn) {
+      activateKeepAwakeAsync("timer");
+    } else {
+      deactivateKeepAwake("timer");
+    }
+  }, [isTimerOn]);
+
+  const saveObject = async () => {
+    const data = { Time: Timer };
+    const today = new Date();
+
+    try {
+      try {
+        const value = await AsyncStorage.getItem("timerData");
+        //todays data
+        let todayvalue = await AsyncStorage.getItem("todayData");
+        const bestDayTime = await AsyncStorage.getItem("bestDayTime");
+
+        //todays date
+        const todayDate = await AsyncStorage.getItem("todayDate");
+
+        if (value !== null && value !== "undefined") {
+          const parsed = JSON.parse(value);
+          if (parsed.Time) {
+            data.Time = parsed.Time + data.Time;
+          }
+        }
+
+        if (
+          todayvalue !== null &&
+          todayvalue !== "undefined" &&
+          todayDate !== null &&
+          todayDate !== "undefined"
+        ) {
+          if (
+            new Date(todayDate).getDate() === today.getDate() &&
+            new Date(todayDate).getMonth() === today.getMonth()
+          ) {
+            todayvalue = JSON.stringify(JSON.parse(todayvalue) + Timer);
+            await AsyncStorage.setItem("todayData", todayvalue);
+          } else {
+            await AsyncStorage.setItem("todayData", JSON.stringify(Timer));
+            await AsyncStorage.setItem("todayDate", today.toISOString());
+          }
+        } else {
+          await AsyncStorage.setItem("todayData", JSON.stringify(Timer));
+          await AsyncStorage.setItem("todayDate", today.toISOString());
+        }
+        if (bestDayTime !== null && bestDayTime !== "undefined") {
+          const bestDayTimeNum = JSON.parse(bestDayTime);
+          if (todayvalue !== null && todayvalue !== "undefined") {
+            const todayValueNum = JSON.parse(todayvalue);
+            if (todayValueNum > bestDayTimeNum) {
+              await AsyncStorage.setItem("bestDayTime", JSON.stringify(todayValueNum));
+            }
+          }
+        } else if (todayvalue !== null && todayvalue !== "undefined") {
+          await AsyncStorage.setItem("bestDayTime", todayvalue);
+        }
+        else{}
+
+
+
+      } catch (error) {
+        console.error("Error loading data:", error);
+      }
+
+      await AsyncStorage.setItem("timerData", JSON.stringify(data));
+    } catch (error) {
+      console.error("Error saving data:", error);
+    }
+
+    setTimer(0);
+    setValue(!value);
+  };
+
+  const buttonPressed = () => {
+    sethideStatusbar(!hideStatusbar);
+    if (isTimerOn) {
+      saveObject();
+    }
+    setIsTimerOn(!isTimerOn);
+
+    // alert("Button Pressed")
+  };
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTime(new Date());
+  //   }, 1000);
+
+  //   return () => clearInterval(interval);
+  // }, []);
+
+  useEffect(() => {
+    if (isTimerOn) {
+      const timer = setInterval(() => {
+        setTimer((prev) => prev + 1);
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [isTimerOn]);
+
+  return (
+    <>
+      <View style={styles.container}>
+        <Settings />
+        <Streak params={false}/>
+        <View style={{ alignItems: "center", justifyContent: "center" }}>
+          {!isTimerOn && (
+            <Text
+              style={{
+                fontSize: 24,
+                alignSelf: "center",
+                position: "absolute",
+                top: -250,
+              }}
+            >
+              {isTimerOn ? "Keep Focusing!" : "Start Focus"}
+            </Text>
+          )}
+
+          {secondsOn && (
+            <Text style={styles.time}>
+              {Timer < 60
+                ? `${Timer.toString().padStart(2, "0")} `
+                : Timer >= 3600
+                  ? `${Math.floor(Timer / 3600)}:${Math.floor((Timer % 3600) / 60)}:${(Timer % 60).toString().padStart(2, "0")}`
+                  : `${Math.floor(Timer / 60)}:${(Timer % 60).toString().padStart(2, "0")}`}
+            </Text>
+          )}
+          {!secondsOn && (
+            <Text style={styles.time}>
+              {Timer < 60
+                ? `00`
+                : Timer >= 3600
+                  ? `${Math.floor(Timer / 3600)}:${Math.floor((Timer % 3600) / 60)}`
+                  : `${Math.floor(Timer / 60)
+                      .toString()
+                      .padStart(2, "0")}`}
+            </Text>
+          )}
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <Pressable
+            onPress={() => {
+              buttonPressed();
+              triggerHaptic();
+            }}
+            style={[isTimerOn ? styles.pauseButton : styles.button]}
+          >
+            <Text style={styles.buttonText}>
+              {isTimerOn ? (
+                <Text>Finish</Text>
+              ) : (
+                <Ionicons name="play" size={20} color="black" />
+              )}
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+      {/* <StatusBar hidden={isTimerOn} style="dark" /> */}
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+
+    justifyContent: "center",
+    // height:"50%",
+  },
+  time: {
+    left: 12,
+    fontSize: 70,
+    bottom: 30,
+    color: "black",
+  },
+  button: {
+    marginTop: 50,
+    width: 80,
+    padding: 10,
+    borderRadius: 20,
+    backgroundColor: "#90EE90",
+  },
+  pauseButton: {
+    borderColor: "black",
+    borderWidth: 2.5,
+
+    borderStyle: "dotted",
+    paddingVertical: 10,
+    paddingHorizontal: 22,
+    borderRadius: 22,
+  },
+  buttonContainer: {
+    position: "absolute",
+    bottom: 160,
+  },
+  buttonText: {
+    textAlign: "center",
+    fontSize: 20,
+  },
+});
