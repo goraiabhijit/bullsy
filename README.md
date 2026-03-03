@@ -1,5 +1,7 @@
 ﻿<div align="center">
 
+<img src="./assets/images/icon.png" alt="Bullsy" width="120" style="border-radius: 24px;" />
+
 # 🔥 Bullsy
 
 **A minimalist focus and productivity tracker.**
