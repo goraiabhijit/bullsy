@@ -1,9 +1,11 @@
-﻿<table>
+﻿<div align="center">
+<table>
 <tr>
 <td><img src="./assets/images/icon.png" alt="Bullsy icon" width="72" style="border-radius: 16px;" /></td>
 <td><h1>Bullsy 🔥</h1></td>
 </tr>
 </table>
+</div>
 
 <div align="center">
 **A minimalist focus and productivity tracker.**
