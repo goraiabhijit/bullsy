@@ -6,13 +6,16 @@
 </tr>
 </table>
 </div>
-<br/>
+
 
 <div align="center">
 **A minimalist focus and productivity tracker.**
 Build daily habits, track your focus sessions, and stay consistent.
 
 <br/>
+<br/>
+
+
 
 <a href="https://buymeacoffee.com/gorai_abhijit_" target="_blank">
   <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50" />
