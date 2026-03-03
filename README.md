@@ -8,10 +8,6 @@
 </div>
 
 <div align="center">
-  <img src="./assets/images/Bullsybanner.png" alt="Bullsy App Preview" width="600" />
-</div>
-
-<div align="center">
 **A minimalist focus and productivity tracker.**
 Build daily habits, track your focus sessions, and stay consistent.
 
@@ -35,6 +31,14 @@ Build daily habits, track your focus sessions, and stay consistent.
 | 🔥 Streak Tracking | Daily streak with fire icon — resets if you miss a day           |
 | 📊 Progress Screen | Today's time, best day, lifetime total, current & longest streak |
 | ⚙️ Settings        | Toggle seconds display, reset all stats                          |
+
+---
+
+## 📱 App Preview
+
+<div align="center">
+  <img src="./assets/images/Bullsybanner.png" alt="Bullsy App Preview" width="600" />
+</div>
 
 ---
 
