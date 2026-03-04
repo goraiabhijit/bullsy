@@ -18,6 +18,9 @@ export default function settingsScreen() {
   const { Darkmode, setDarkmode } = useContext(AppContext);
   const { currentStreak, setcurrentStreak } = useContext(AppContext);
     const { bestDayTime, setBestDayTime } = useContext(AppContext);
+     const {longestStreak, setlongestStreak} = useContext(AppContext);
+
+     const {isFireActive, setisFireActive} = useContext(AppContext);
 
   const triggerHaptic = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -63,7 +66,8 @@ export default function settingsScreen() {
     }
     setcurrentStreak(0);
     setBestDayTime(0);
-
+    setlongestStreak(0);
+    setisFireActive(false);
     setValue(!value);
   };
 

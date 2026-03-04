@@ -9,43 +9,77 @@ import inactiveStreak from "../UIassets/streakInactive.png";
 const Streak = ({ params }: { params: boolean }) => {
   const { currentStreak, setcurrentStreak } = useContext(AppContext);
   const { value, setValue } = useContext(AppContext);
-  const [isFireActive, setisFireActive] = useState(false);
+  const { isFireActive, setisFireActive } = useContext(AppContext);
+
+  // Helper to calculate days between two dates
+  const getDaysDiff = (date1: Date, date2: Date): number => {
+    const oneDay = 24 * 60 * 60 * 1000; // ms in a day
+    const d1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
+    const d2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
+    return Math.round((d1.getTime() - d2.getTime()) / oneDay);
+  };
 
   //   function to set current streak
 
   const setCurrentStreak = async () => {
-    const streakDate = new Date().getDate();
+    const today = new Date();
     try {
       const storedStreakDate = await AsyncStorage.getItem("streakDate");
 
       const todaytime = await AsyncStorage.getItem("todayData");
       if (todaytime !== null && todaytime !== "undefined") {
         const todayTimeNum = JSON.parse(todaytime);
-        const storedStreakDateNum =
-          storedStreakDate !== null ? JSON.parse(storedStreakDate) : null;
-        if (todayTimeNum > 3600 && (streakDate-storedStreakDateNum)>0) {
-            if((streakDate-storedStreakDateNum)<2){
-                // only update streakk if its just the next day and else reset the streak
-                const updatedStreak = currentStreak + 1;
-                setisFireActive(true);
-                setcurrentStreak(updatedStreak);
-      
-                await AsyncStorage.setItem(
-                  "currentStreak",
-                  JSON.stringify(updatedStreak),
-                );
-      
-                await AsyncStorage.setItem("streakDate", JSON.stringify(streakDate));
 
-            }
-            else{
-                // reset streak if more than one day has passed
-                setcurrentStreak(0);
-                await AsyncStorage.setItem("currentStreak", JSON.stringify(0));
-                await AsyncStorage.setItem("streakDate", JSON.stringify(streakDate));
-            }
+        // First time - no streak date stored yet
+        if (storedStreakDate === null || storedStreakDate === "undefined") {
+          if (todayTimeNum > 3) {
+            setisFireActive(true);
+            setcurrentStreak(1);
+            await AsyncStorage.setItem("currentStreak", JSON.stringify(1));
+            await AsyncStorage.setItem("streakDate", today.toISOString());
+          }
+          return;
+        }
 
+        // Parse stored date - handle old format (number), raw string, or JSON string
+        let storedDate: Date;
+        let parsed: any;
+        try {
+          parsed = JSON.parse(storedStreakDate);
+        } catch {
+          // Not valid JSON - use raw string directly
+          parsed = storedStreakDate;
+        }
 
+        if (typeof parsed === "number") {
+          // Old format: just day number - migrate to new format
+          await AsyncStorage.setItem("streakDate", today.toISOString());
+          storedDate = today; // Treat as today to avoid breaking streak
+        } else {
+          storedDate = new Date(parsed);
+        }
+        const dayDiff = getDaysDiff(today, storedDate);
+
+        if (todayTimeNum > 3 && dayDiff > 0) {
+          if (dayDiff === 1) {
+            // only update streak if its just the next day
+            const updatedStreak = currentStreak + 1;
+            setisFireActive(true);
+            setcurrentStreak(updatedStreak);
+
+            await AsyncStorage.setItem(
+              "currentStreak",
+              JSON.stringify(updatedStreak),
+            );
+
+            await AsyncStorage.setItem("streakDate", today.toISOString());
+          } else {
+            // reset streak if more than one day has passed
+            setcurrentStreak(1);
+            setisFireActive(false);
+            await AsyncStorage.setItem("currentStreak", JSON.stringify(1));
+            await AsyncStorage.setItem("streakDate", today.toISOString());
+          }
         }
       }
     } catch (error) {
@@ -69,14 +103,30 @@ const Streak = ({ params }: { params: boolean }) => {
 
   // update the fire icon
   const updatefire = async () => {
-    const today = new Date().getDate();
+    const today = new Date();
     try {
       const stored = await AsyncStorage.getItem("streakDate");
 
-      if (stored !== null) {
-        const parsedData = JSON.parse(stored);
+      if (stored !== null && stored !== "undefined") {
+        let parsed: any;
+        try {
+          parsed = JSON.parse(stored);
+        } catch {
+          // Not valid JSON - use raw string directly
+          parsed = stored;
+        }
 
-        if (parsedData === today) {
+        let storedDate: Date;
+        if (typeof parsed === "number") {
+          // Old format: just day number - can't accurately compare
+          setisFireActive(false);
+          return;
+        } else {
+          storedDate = new Date(parsed);
+        }
+        const dayDiff = getDaysDiff(today, storedDate);
+
+        if (dayDiff === 0) {
           setisFireActive(true);
         } else {
           setisFireActive(false);
@@ -91,7 +141,7 @@ const Streak = ({ params }: { params: boolean }) => {
 
   useEffect(() => {
     updatefire();
-  }, [value]);
+  }, []);
 
   useEffect(() => {
     getCurrentStreak();
@@ -131,8 +181,8 @@ const Streak = ({ params }: { params: boolean }) => {
             fontSize: 25,
           }}
         >
-          {isFireActive || params? currentStreak:currentStreak+1}
-          {(!isFireActive && !params) ? "?": null }
+          {isFireActive || params ? currentStreak : currentStreak + 1}
+          {!isFireActive && !params ? "?" : null}
         </Text>
       </View>
     </View>

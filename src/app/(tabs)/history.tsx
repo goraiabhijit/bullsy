@@ -41,28 +41,30 @@ export default function history() {
 
   const setLongestStreak = async () => {
     try {
-      const currentStreak = await AsyncStorage.getItem("currentStreak");
-      const longestStreak = await AsyncStorage.getItem("longestStreak");
-      if (
-        currentStreak !== null &&
-        currentStreak !== "undefined" &&
-        longestStreak !== null &&
-        longestStreak !== "undefined"
-      ) {
-        const currentStreakNum = JSON.parse(currentStreak);
-        const longestStreakNum = JSON.parse(longestStreak);
+      const currentStreakStr = await AsyncStorage.getItem("currentStreak");
+      const longestStreakStr = await AsyncStorage.getItem("longestStreak");
+      
+      if (currentStreakStr === null || currentStreakStr === "undefined") {
+        return; // No current streak yet
+      }
+      
+      const currentStreakNum = JSON.parse(currentStreakStr);
+      
+      // If longestStreak doesn't exist yet, initialize it
+      if (longestStreakStr === null || longestStreakStr === "undefined") {
+        await AsyncStorage.setItem("longestStreak", JSON.stringify(currentStreakNum));
+        setlongestStreak(currentStreakNum);
+        return;
+      }
+      
+      const longestStreakNum = JSON.parse(longestStreakStr);
 
-        if (currentStreakNum > longestStreakNum) {
-          try {
-            await AsyncStorage.setItem(
-              "longestStreak",
-              JSON.stringify(currentStreakNum),
-            );
-            setlongestStreak(currentStreakNum);
-          } catch (error) {
-            console.error("Error setting longest streak:", error);
-          }
-        }
+      if (currentStreakNum > longestStreakNum) {
+        await AsyncStorage.setItem(
+          "longestStreak",
+          JSON.stringify(currentStreakNum),
+        );
+        setlongestStreak(currentStreakNum);
       }
     } catch (error) {
       console.error("Error setting longest streak:", error);
@@ -135,10 +137,10 @@ export default function history() {
 
             <Text style={{ fontSize: 30, textAlign: "center" }}>
               {todayTime < 60
-                ? `${todayTime.toString().padStart(2, "0")} s`
+                ? `00 m `
                 : todayTime >= 3600
-                  ? `${Math.floor(todayTime / 3600)}h ${Math.floor((todayTime % 3600) / 60)}m ${(todayTime % 60).toString().padStart(2, "0")}s`
-                  : `${Math.floor(todayTime / 60)}m ${(todayTime % 60).toString().padStart(2, "0")}s`}
+                  ? `${Math.floor(todayTime / 3600)}h ${Math.floor((todayTime % 3600) / 60)}m`
+                  : `${Math.floor(todayTime / 60)}m`}
             </Text>
       
 
@@ -151,10 +153,10 @@ export default function history() {
             <Text style={{ marginBottom: 10 }}>Best Day</Text>
             <Text style={{ fontSize: 30, textAlign: "center" }}>
               {bestDayTime < 60
-                ? `${bestDayTime.toString().padStart(2, "0")} s`
+                ? `00 m`
                 : bestDayTime >= 3600
-                  ? `${Math.floor(bestDayTime / 3600)}h ${Math.floor((bestDayTime % 3600) / 60)}m ${(bestDayTime % 60).toString().padStart(2, "0")}s`
-                  : `${Math.floor(bestDayTime / 60)}m ${(bestDayTime % 60).toString().padStart(2, "0")}s`}
+                  ? `${Math.floor(bestDayTime / 3600)}h ${Math.floor((bestDayTime % 3600) / 60)}m`
+                  : `${Math.floor(bestDayTime / 60)}m`}
             </Text>
           </View>
         </View>
@@ -164,10 +166,10 @@ export default function history() {
         <Text style={{ marginBottom: 10 }}>Life Time</Text>
         <Text style={{ fontSize: 30, textAlign: "center" }}>
           {Time < 60
-            ? `${Time.toString().padStart(2, "0")} s`
+            ? `00 m `
             : Time >= 3600
-              ? `${Math.floor(Time / 3600)}h ${Math.floor((Time % 3600) / 60)}m ${(Time % 60).toString().padStart(2, "0")}s`
-              : `${Math.floor(Time / 60)}m ${(Time % 60).toString().padStart(2, "0")}s`}
+              ? `${Math.floor(Time / 3600)}h ${Math.floor((Time % 3600) / 60)}m`
+              : `${Math.floor(Time / 60)}m`}
         </Text>
       </View>
       <View

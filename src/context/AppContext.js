@@ -12,11 +12,12 @@ export function AppProvider({ children }) {
   //for longest streak displaying in history
   const [longestStreak, setlongestStreak] = useState(0);
    const [bestDayTime, setBestDayTime] = useState(0);
+    const [isFireActive, setisFireActive] = useState(false);
 
 
 
   return (
-    <AppContext.Provider value={{ value, setValue, secondsOn, setsecondsOn, Darkmode, setDarkmode ,hideStatusbar, sethideStatusbar, currentStreak, setcurrentStreak, longestStreak, setlongestStreak, bestDayTime, setBestDayTime }}>
+    <AppContext.Provider value={{ value, setValue, secondsOn, setsecondsOn, Darkmode, setDarkmode ,hideStatusbar, sethideStatusbar, currentStreak, setcurrentStreak, longestStreak, setlongestStreak, bestDayTime, setBestDayTime, isFireActive, setisFireActive }}>
 
       {children}
     </AppContext.Provider>
