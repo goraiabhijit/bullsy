@@ -99,16 +99,18 @@ export default function Index() {
             );
             await AsyncStorage.setItem("todayData", todayvalue);
           } else {
+            todayvalue = JSON.stringify(timePassedRef.current);
             await AsyncStorage.setItem(
               "todayData",
-              JSON.stringify(timePassedRef.current),
+              todayvalue,
             );
             await AsyncStorage.setItem("todayDate", today.toISOString());
           }
         } else {
+          todayvalue = JSON.stringify(timePassedRef.current);
           await AsyncStorage.setItem(
             "todayData",
-            JSON.stringify(timePassedRef.current),
+            todayvalue,
           );
           await AsyncStorage.setItem("todayDate", today.toISOString());
         }
@@ -123,9 +125,23 @@ export default function Index() {
                 JSON.stringify(todayValueNum),
               );
             }
+          } else {
+            // First run of the day: compare current session with best
+            if (timePassedRef.current > bestDayTimeNum) {
+              await AsyncStorage.setItem(
+                "bestDayTime",
+                JSON.stringify(timePassedRef.current),
+              );
+            }
           }
         } else if (todayvalue !== null && todayvalue !== "undefined") {
           await AsyncStorage.setItem("bestDayTime", todayvalue);
+        } else {
+          // First run ever: set bestDayTime to current session
+          await AsyncStorage.setItem(
+            "bestDayTime",
+            JSON.stringify(timePassedRef.current),
+          );
         }
       } catch (error) {
         console.error("Error loading data:", error);
@@ -174,7 +190,7 @@ export default function Index() {
     if (isTimerOn) {
       const timer = setInterval(() => {
         setTimer((prev) => {
-          if (prev <= 0) {
+          if (prev <=0) {
             timerFinishedVibrate();
             triggerOverlay();
             clearInterval(timer);

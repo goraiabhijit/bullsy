@@ -65,11 +65,13 @@ export default function Index() {
             todayvalue = JSON.stringify(JSON.parse(todayvalue) + Timer);
             await AsyncStorage.setItem("todayData", todayvalue);
           } else {
-            await AsyncStorage.setItem("todayData", JSON.stringify(Timer));
+            todayvalue = JSON.stringify(Timer);
+            await AsyncStorage.setItem("todayData", todayvalue);
             await AsyncStorage.setItem("todayDate", today.toISOString());
           }
         } else {
-          await AsyncStorage.setItem("todayData", JSON.stringify(Timer));
+          todayvalue = JSON.stringify(Timer);
+          await AsyncStorage.setItem("todayData", todayvalue);
           await AsyncStorage.setItem("todayDate", today.toISOString());
         }
         if (bestDayTime !== null && bestDayTime !== "undefined") {
@@ -79,11 +81,19 @@ export default function Index() {
             if (todayValueNum > bestDayTimeNum) {
               await AsyncStorage.setItem("bestDayTime", JSON.stringify(todayValueNum));
             }
+          } else {
+            // First run of the day: compare current session with best
+            if (Timer > bestDayTimeNum) {
+              await AsyncStorage.setItem("bestDayTime", JSON.stringify(Timer));
+            }
           }
         } else if (todayvalue !== null && todayvalue !== "undefined") {
           await AsyncStorage.setItem("bestDayTime", todayvalue);
+        } else {
+          // First run ever: set bestDayTime to current session
+          await AsyncStorage.setItem("bestDayTime", JSON.stringify(Timer));
         }
-        else{}
+        
 
 
 
@@ -109,13 +119,7 @@ export default function Index() {
 
     // alert("Button Pressed")
   };
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setTime(new Date());
-  //   }, 1000);
 
-  //   return () => clearInterval(interval);
-  // }, []);
 
   useEffect(() => {
     if (isTimerOn) {

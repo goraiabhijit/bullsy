@@ -127,10 +127,10 @@ export default function history() {
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            width: "50%",
+            width: "90%",
           }}
         >
-          <View>
+          <View style={{ flex: 1, alignItems: "center" }}>
             <Text style={{ marginBottom: 10 }}>Today</Text>
 
             <Text style={{ fontSize: 30, textAlign: "center" }}>
@@ -140,12 +140,17 @@ export default function history() {
                   ? `${Math.floor(todayTime / 3600)}h ${Math.floor((todayTime % 3600) / 60)}m ${(todayTime % 60).toString().padStart(2, "0")}s`
                   : `${Math.floor(todayTime / 60)}m ${(todayTime % 60).toString().padStart(2, "0")}s`}
             </Text>
+      
+
+
           </View>
-          <View style={{height:"100%",borderWidth:1,borderColor:"black"}}></View>
-          <View >
+          <View
+            style={{ height: "100%", borderWidth: 1, borderColor: "black" }}
+          ></View>
+          <View style={{ flex: 1, alignItems: "center" }}>
             <Text style={{ marginBottom: 10 }}>Best Day</Text>
             <Text style={{ fontSize: 30, textAlign: "center" }}>
-                 {bestDayTime < 60
+              {bestDayTime < 60
                 ? `${bestDayTime.toString().padStart(2, "0")} s`
                 : bestDayTime >= 3600
                   ? `${Math.floor(bestDayTime / 3600)}h ${Math.floor((bestDayTime % 3600) / 60)}m ${(bestDayTime % 60).toString().padStart(2, "0")}s`
