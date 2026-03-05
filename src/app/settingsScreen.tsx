@@ -1,7 +1,7 @@
 import { AppContext } from "@/context/AppContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Alert,
   Linking,
@@ -14,13 +14,14 @@ import {
 
 export default function settingsScreen() {
   const { secondsOn, setsecondsOn } = useContext(AppContext);
+  const [isInitialized, setIsInitialized] = useState(false);
   const { value, setValue } = useContext(AppContext);
   const { Darkmode, setDarkmode } = useContext(AppContext);
   const { currentStreak, setcurrentStreak } = useContext(AppContext);
-    const { bestDayTime, setBestDayTime } = useContext(AppContext);
-     const {longestStreak, setlongestStreak} = useContext(AppContext);
+  const { bestDayTime, setBestDayTime } = useContext(AppContext);
+  const { longestStreak, setlongestStreak } = useContext(AppContext);
 
-     const {isFireActive, setisFireActive} = useContext(AppContext);
+  const { isFireActive, setisFireActive } = useContext(AppContext);
 
   const triggerHaptic = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -80,6 +81,7 @@ export default function settingsScreen() {
     } catch (error) {
       console.error("Error fetching secondsOn state:", error);
     }
+    setIsInitialized(true);
   };
   const saveSecondShowState = async () => {
     try {
@@ -91,8 +93,10 @@ export default function settingsScreen() {
 
   // saving secondsstate
   useEffect(() => {
-    saveSecondShowState();
-  }, [secondsOn]);
+    if (isInitialized) {
+      saveSecondShowState();
+    }
+  }, [secondsOn, isInitialized]);
 
   //  fetching seconds
   useEffect(() => {
