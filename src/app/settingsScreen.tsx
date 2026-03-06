@@ -1,7 +1,7 @@
 import { AppContext } from "@/context/AppContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
-import React, { useContext, useCallback,useEffect } from "react";
+import React, { useContext, useCallback, useEffect, useState } from "react";
 import { useFocusEffect } from '@react-navigation/native';
 import {
   Alert,
@@ -11,6 +11,7 @@ import {
   Text,
   Vibration,
   View,
+  Image
 } from "react-native";
 
 export default function settingsScreen() {
@@ -138,6 +139,7 @@ export default function settingsScreen() {
 
   // darkmode
 
+
   return (
     <>
       {/* <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }}> */}
@@ -156,21 +158,20 @@ export default function settingsScreen() {
               Linking.openURL("https://buymeacoffee.com/gorai_abhijit_")
             }
             style={{
-              flexDirection: "row",
-              alignItems: "center",
               backgroundColor: "#FFDD00",
               borderRadius: 8,
               paddingVertical: 10,
               paddingHorizontal: 20,
-              gap: 8,
               width: "100%",
               justifyContent: "center",
+              alignItems: "center",
             }}
           >
-            <Text style={{ fontSize: 24 }}>☕</Text>
-            <Text style={{ fontSize: 16, fontWeight: "700", color: "#000000" }}>
-              Buy me a coffee
-            </Text>
+            <Image
+              source={require("../../assets/images/bmc-button.png")}
+              style={{ width: "100%", height: 40 }}
+              resizeMode="contain"
+            />
           </Pressable>
 
           <View style={styles.settingitem}>
@@ -277,8 +278,6 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: "center",
     flex: 1,
-
-    // backgroundColor: "red",
   },
   settingitem: {
     flexDirection: "row",
@@ -321,9 +320,9 @@ const styles = StyleSheet.create({
     // borderRadius: 15,
   },
   resetButtonContainer: {
-    position: "absolute",
-
-    bottom: 200,
+    position: "relative",
+    top: 50,
+    // bottom: 200,
     backgroundColor: "#ffffff",
     borderColor: "#FF6347",
     borderWidth: 2,
