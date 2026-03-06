@@ -1,7 +1,8 @@
 import { AppContext } from "@/context/AppContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useCallback,useEffect } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import {
   Alert,
   Linking,
@@ -13,15 +14,25 @@ import {
 } from "react-native";
 
 export default function settingsScreen() {
-  const { secondsOn, setsecondsOn } = useContext(AppContext);
-  const [isInitialized, setIsInitialized] = useState(false);
-  const { value, setValue } = useContext(AppContext);
-  const { Darkmode, setDarkmode } = useContext(AppContext);
-  const { currentStreak, setcurrentStreak } = useContext(AppContext);
-  const { bestDayTime, setBestDayTime } = useContext(AppContext);
-  const { longestStreak, setlongestStreak } = useContext(AppContext);
-
-  const { isFireActive, setisFireActive } = useContext(AppContext);
+  const {
+    secondsOn,
+    setsecondsOn,
+    value,
+    setValue,
+    Darkmode,
+    setDarkmode,
+    currentStreak,
+    setcurrentStreak,
+    bestDayTime,
+    setBestDayTime,
+    longestStreak,
+    setlongestStreak,
+    isFireActive,
+    setisFireActive,
+    isInitialized,
+    setIsInitialized,
+    fetchSecondsShowState
+  } = useContext(AppContext);
 
   const triggerHaptic = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -72,17 +83,18 @@ export default function settingsScreen() {
     setValue(!value);
   };
 
-  const fetchSecondsShowState = async () => {
-    try {
-      const storedSecondsOn = await AsyncStorage.getItem("secondsOn");
-      if (storedSecondsOn !== null) {
-        setsecondsOn(JSON.parse(storedSecondsOn));
-      }
-    } catch (error) {
-      console.error("Error fetching secondsOn state:", error);
-    }
-    setIsInitialized(true);
-  };
+  // const fetchSecondsShowState = async () => {
+  //   try {
+  //     const storedSecondsOn = await AsyncStorage.getItem("secondsOn");
+  //     if (storedSecondsOn !== null) {
+  //       setsecondsOn(JSON.parse(storedSecondsOn));
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching secondsOn state:", error);
+  //   }
+  //   setIsInitialized(true);
+  // };
+  // Now use fetchSecondsShowState from AppContext
   const saveSecondShowState = async () => {
     try {
       await AsyncStorage.setItem("secondsOn", JSON.stringify(secondsOn));
@@ -98,10 +110,12 @@ export default function settingsScreen() {
     }
   }, [secondsOn, isInitialized]);
 
-  //  fetching seconds
-  useEffect(() => {
-    fetchSecondsShowState();
-  }, []);
+  //  fetching seconds when screen is focused using useFocusEffect
+  useFocusEffect(
+    useCallback(() => {
+      fetchSecondsShowState();
+    }, [fetchSecondsShowState])
+  );
 
   const toggleSecondsOn = () => {
     setsecondsOn(true);
