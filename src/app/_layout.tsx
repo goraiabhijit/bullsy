@@ -4,9 +4,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useContext, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { darkTheme,lightTheme } from "@/theme";
-
-
+import { darkTheme, lightTheme } from "@/theme";
 
 export default function RootLayout() {
   return (
@@ -30,28 +28,25 @@ function InnerLayout() {
           screenOptions={{
             headerStyle: {
               backgroundColor: theme.background,
-             
             },
-         
           }}
         >
-          <Stack.Screen name="(tabs)" 
-          options={{
-             headerShown: false ,
-             headerTitleAlign: "left",
-             }} />
+          <Stack.Screen
+            name="(tabs)"
+            options={{
+              headerShown: false,
+          
+            }}
+          />
           <Stack.Screen
             name="settingsScreen"
             options={{
               title: "Settings",
-              headerTitleAlign: "left",
+              headerTitleAlign: "center",
               headerTitleStyle: {
                 fontSize: 30,
-                
-               
               },
-               headerTintColor: theme.text,
-              
+              headerTintColor: theme.text,
             }}
           />
         </Stack>

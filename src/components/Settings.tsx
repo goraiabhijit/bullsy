@@ -18,7 +18,7 @@ import { AppContext } from "@/context/AppContext";
 
            <Pressable>
         <Link href="/settingsScreen">
-        <MaterialCommunityIcons name="cog" size={27} color={theme.secondaryText} />
+        <MaterialCommunityIcons name="cog" size={35} color={theme.secondaryText} />
         </Link>
       </Pressable>
             </View>

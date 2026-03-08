@@ -11,7 +11,7 @@
       "icon": "./assets/images/icon.png"
     },
     "android": {
-      "versionCode": 6, //this is already updated version code for now delete this comment when u will gitpush and rebuild
+      "versionCode": 6,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
