@@ -10,16 +10,27 @@ import { useIsFocused } from "@react-navigation/native";
 import activeStreak from "../../UIassets/streakActive.png";
 import inactiveStreak from "../../UIassets/streakInactive.png";
 import { Image } from "expo-image";
+import {darkTheme, lightTheme} from "@/theme";
 
 export default function history() {
   //to check if the settings is in focus for ? after the streak
   const isFocused = useIsFocused();
-  const { value, setValue } = useContext(AppContext);
+  const {
+    value,
+    setValue,
+    currentStreak,
+    setCurrentStreak,
+    longestStreak,
+    setlongestStreak,
+    bestDayTime,
+    setBestDayTime,
+    DarkMode,
+    isFireActive,
+  } = useContext(AppContext);
   const [Time, setTime] = useState(0);
   const [todayTime, settodayTime] = useState(0);
-  const { currentStreak, setCurrentStreak } = useContext(AppContext);
-  const { longestStreak, setlongestStreak } = useContext(AppContext);
-  const { bestDayTime, setBestDayTime } = useContext(AppContext);
+
+  const theme = DarkMode ? darkTheme : lightTheme;
 
   //fetching longest streak from async storage and set it to context only runs once empty dependency
   const fetchlongestStreak = async () => {
@@ -119,12 +130,17 @@ export default function history() {
   }, [value]);
 
   return (
-    <View style={styles.container}>
-      <Text style={{ fontSize: 25, fontWeight: "bold", top: 50 }}>
+     <View style={[styles.container, {backgroundColor: theme.background}]}>
+      <Text style={{ fontSize: 30, fontWeight: "bold", top: 50, color:theme.text }}>
         Progress
       </Text>
-      <Settings />
-      <View style={styles.box}>
+        <View style={{ position: "absolute", top: 0, width: "100%", 
+        flexDirection: "row", justifyContent: "flex-end", padding: 30
+      }}>
+          <Settings />
+
+        </View>
+      <View style={[styles.box,{backgroundColor:theme.cardColor}]}>
         <View
           style={{
             flexDirection: "row",
@@ -133,9 +149,9 @@ export default function history() {
           }}
         >
           <View style={{ flex: 1, alignItems: "center" }}>
-            <Text style={{ marginBottom: 10 }}>Today</Text>
+            <Text style={{ marginBottom: 10 ,color:theme.text }}>Today</Text>
 
-            <Text style={{ fontSize: 30, textAlign: "center" }}>
+            <Text style={{ fontSize: 32, fontWeight: "bold", textAlign: "center" ,color:theme.text}}>
               {todayTime < 60
                 ? `00 m `
                 : todayTime >= 3600
@@ -147,11 +163,11 @@ export default function history() {
 
           </View>
           <View
-            style={{ height: "100%", borderWidth: 1, borderColor: "black" }}
+            style={{ height: "100%", borderWidth: 1, borderColor: theme.text }}
           ></View>
           <View style={{ flex: 1, alignItems: "center" }}>
-            <Text style={{ marginBottom: 10 }}>Best Day</Text>
-            <Text style={{ fontSize: 30, textAlign: "center" }}>
+            <Text style={{ marginBottom: 10,color:theme.text }}>Best Day</Text>
+            <Text style={{ fontSize: 32, fontWeight: "bold", textAlign: "center" ,color:theme.text}}>
               {bestDayTime < 60
                 ? `00 m`
                 : bestDayTime >= 3600
@@ -162,9 +178,9 @@ export default function history() {
         </View>
       </View>
 
-      <View style={styles.box}>
-        <Text style={{ marginBottom: 10 }}>Life Time</Text>
-        <Text style={{ fontSize: 30, textAlign: "center" }}>
+         <View style={[styles.box,{backgroundColor:theme.cardColor}]}>
+        <Text style={{ marginBottom: 10 ,color:theme.text}}>Life Time</Text>
+        <Text style={{ fontSize: 32, fontWeight: "bold", textAlign: "center" ,color:theme.text }}>
           {Time < 60
             ? `00 m `
             : Time >= 3600
@@ -179,14 +195,14 @@ export default function history() {
           justifyContent: "space-between",
         }}
       >
-        <View style={styles.streakbox}>
-          <Text style={{ marginBottom: 10 }}>CurrentStreak</Text>
-          <View style={{ top: -50, left: -39, marginBottom: 20 }}>
+            <View style={[styles.streakbox,{backgroundColor:theme.cardColor}]}>
+          <Text style={{ marginBottom: 10 ,color:theme.text}}>CurrentStreak</Text>
+          <View style={{  marginBottom: 0}}>
             <Streak params={isFocused} />
           </View>
         </View>
-        <View style={styles.streakbox}>
-          <Text style={{ marginBottom: 10 }}>Longest Streak</Text>
+        <View style={[styles.streakbox,{backgroundColor:theme.cardColor}]}>
+          <Text style={{ marginBottom: 10 ,color:theme.text}}>Longest Streak</Text>
           <View
             style={{
               flexDirection: "row",
@@ -196,12 +212,12 @@ export default function history() {
           >
             <Image
               source={longestStreak > 0 ? activeStreak : inactiveStreak}
-              style={{ height: 30, width: 30 }}
+              style={{ height: 30, width: 30, tintColor: !isFireActive ?  theme.secondaryText:undefined  }}
             />
             <Text
-              style={{ fontSize: 25, textAlign: "center", fontWeight: "bold" }}
+              style={{ fontSize: 32, textAlign: "center", fontWeight: "bold" ,color: theme.text }}
             >
-              {longestStreak}{" "}
+              {longestStreak}
             </Text>
           </View>
         </View>
@@ -227,6 +243,12 @@ const styles = StyleSheet.create({
     // borderColor: "black",
     // borderWidth: 1,
     borderRadius: 20,
+   shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 7,
+    shadowOffset: { width: 0, height: 8 },
+
 
     alignItems: "center",
     justifyContent: "center",
@@ -239,7 +261,11 @@ const styles = StyleSheet.create({
     // borderColor: "black",
     // borderWidth: 1,
     borderRadius: 20,
-
+    shadowColor: "#000",
+   shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 7,
+    shadowOffset: { width: 0, height: 8 },
     alignItems: "center",
     justifyContent: "center",
   },

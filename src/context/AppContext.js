@@ -6,7 +6,8 @@ export const AppContext = createContext();
 export function AppProvider({ children }) {
   const [value, setValue] = useState(false); // your single state
   const [secondsOn, setsecondsOn] = useState(true);
-  const [Darkmode, setDarkmode] = useState(false);
+
+  const [DarkMode, setDarkMode] = useState(true);
   const [hideStatusbar, sethideStatusbar] = useState(false);
   const [currentStreak, setcurrentStreak] = useState(0);
   //for longest streak displaying in history
@@ -14,6 +15,7 @@ export function AppProvider({ children }) {
   const [bestDayTime, setBestDayTime] = useState(0);
   const [isFireActive, setisFireActive] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isDarkInitialized, setIsDarkInitialized] = useState(false)
 
   // Move fetchSecondsShowState here
   const fetchSecondsShowState = async () => {
@@ -28,9 +30,23 @@ export function AppProvider({ children }) {
     setIsInitialized(true);
   };
 
+  const fetchDarkState = async () => {
+    try {
+      const storedDark = await AsyncStorage.getItem("darkState");
+      if (storedDark !== null) {
+        setDarkMode(JSON.parse(storedDark));
+      }
+    } catch (error) {
+      console.error("Error fetching dark state:", error);
+    }
+    setIsDarkInitialized(true);
+  };
+
   useEffect(() => {
     fetchSecondsShowState();
+    fetchDarkState();
   }, []);
+
 
   return (
     <AppContext.Provider
@@ -39,8 +55,8 @@ export function AppProvider({ children }) {
         setValue,
         secondsOn,
         setsecondsOn,
-        Darkmode,
-        setDarkmode,
+        DarkMode,
+        setDarkMode,
         hideStatusbar,
         sethideStatusbar,
         currentStreak,
@@ -54,6 +70,8 @@ export function AppProvider({ children }) {
         isInitialized,
         setIsInitialized,
         fetchSecondsShowState,
+        isDarkInitialized,
+        setIsDarkInitialized
       }}
     >
       {children}

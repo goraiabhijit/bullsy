@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { AppProvider, AppContext } from "@/context/AppContext";
 import { Text, View, StyleSheet, Pressable } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -8,16 +8,27 @@ import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import * as Haptics from "expo-haptics";
+import {darkTheme, lightTheme} from "@/theme";
 
 export default function Index() {
   // const [Time, setTime] = useState(new Date());
 
-  const { secondsOn } = useContext(AppContext);
-  const { value, setValue } = useContext(AppContext);
+  const {
+    secondsOn,
+    value,
+    setValue,
+    hideStatusbar,
+    sethideStatusbar,
+    DarkMode,
+  } = useContext(AppContext);
+
   const [isTimerOn, setIsTimerOn] = useState(false);
   const [Timer, setTimer] = useState(0);
+  const startTimeRef = useRef<number | null>(null);
   const [hideStatus, sethideStatus] = useState(false);
-  const { hideStatusbar, sethideStatusbar } = useContext(AppContext);
+
+const theme = DarkMode ? darkTheme : lightTheme;
+
 
   const triggerHaptic = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -112,11 +123,16 @@ export default function Index() {
 
   const buttonPressed = () => {
     sethideStatusbar(!hideStatusbar);
-    if (isTimerOn) {
+    if (!isTimerOn) {
+      // Start timer: set start time
+      startTimeRef.current = Date.now();
+      setIsTimerOn(true);
+    } else {
+      // Stop timer: save and reset
       saveObject();
+      setIsTimerOn(false);
+      startTimeRef.current = null;
     }
-    setIsTimerOn(!isTimerOn);
-
     // alert("Button Pressed")
   };
 
@@ -124,18 +140,30 @@ export default function Index() {
   useEffect(() => {
     if (isTimerOn) {
       const timer = setInterval(() => {
-        setTimer((prev) => prev + 1);
+        if (startTimeRef.current !== null) {
+          const diff = Math.floor((Date.now() - startTimeRef.current) / 1000);
+          setTimer(diff);
+        }
       }, 1000);
-
       return () => clearInterval(timer);
     }
   }, [isTimerOn]);
 
   return (
     <>
-      <View style={styles.container}>
-        <Settings />
+      <View style={[styles.container, {backgroundColor: theme.background}]}>
+        {!isTimerOn &&(
+        <View style={{ position: "absolute", top: 0, width: "100%", 
+        flexDirection: "row", justifyContent: "space-between", padding: 30
+        }}>
+
         <Streak params={false}/>
+        <Settings />
+        </View>
+
+        )
+        
+        }
         <View style={{ alignItems: "center", justifyContent: "center" }}>
           {!isTimerOn && (
             <Text
@@ -144,6 +172,7 @@ export default function Index() {
                 alignSelf: "center",
                 position: "absolute",
                 top: -250,
+                color: theme.secondaryText,
               }}
             >
               {isTimerOn ? "Keep Focusing!" : "Start Focus"}
@@ -151,7 +180,7 @@ export default function Index() {
           )}
 
           {secondsOn && (
-            <Text style={styles.time}>
+            <Text style={[styles.time, { color: theme.text }]}>
               {Timer < 60
                 ? `${Timer.toString().padStart(2, "0")} `
                 : Timer >= 3600
@@ -160,14 +189,14 @@ export default function Index() {
             </Text>
           )}
           {!secondsOn && (
-            <Text style={styles.time}>
+            <Text style={[styles.time, { color: theme.text }]}>
               {Timer < 60
                 ? `00`
                 : Timer >= 3600
-                  ? `${Math.floor(Timer / 3600)}:${Math.floor((Timer % 3600) / 60)}`
-                  : `${Math.floor(Timer / 60)
+                  ? `${Math.floor(Timer / 3600)}:${Math.floor((Timer % 3600) / 60).toString().padStart(2, "0")}`
+                  : `${Math.floor(Timer / 60)}`
                       .toString()
-                      .padStart(2, "0")}`}
+                      .padStart(2, "0")}
             </Text>
           )}
         </View>
@@ -178,11 +207,10 @@ export default function Index() {
               buttonPressed();
               triggerHaptic();
             }}
-            style={[isTimerOn ? styles.pauseButton : styles.button]}
-          >
+            style={[isTimerOn ? styles.pauseButton : styles.button , isTimerOn ? {borderColor:theme.text}: {backgroundColor:theme.onbutton}]} >
             <Text style={styles.buttonText}>
               {isTimerOn ? (
-                <Text>Finish</Text>
+                <Text style={{color:theme.text}}>Finish</Text>
               ) : (
                 <Ionicons name="play" size={20} color="black" />
               )}
@@ -200,15 +228,17 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     backgroundColor: "#f5f5f5",
+    
 
     justifyContent: "center",
     // height:"50%",
   },
   time: {
     left: 12,
-    fontSize: 70,
+    fontSize: 80,
     bottom: 30,
     color: "black",
+    fontWeight: "bold",
   },
   button: {
     marginTop: 50,

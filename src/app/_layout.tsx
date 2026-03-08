@@ -1,46 +1,60 @@
-import { AppProvider } from "@/context/AppContext";
+import { AppContext, AppProvider } from "@/context/AppContext";
 import * as NavigationBar from "expo-navigation-bar";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { darkTheme,lightTheme } from "@/theme";
+
+
 
 export default function RootLayout() {
+  return (
+    <AppProvider>
+      <InnerLayout />
+    </AppProvider>
+  );
+}
+
+function InnerLayout() {
+  const { DarkMode } = useContext(AppContext);
+  const theme = DarkMode ? darkTheme : lightTheme;
   useEffect(() => {
-    NavigationBar.setButtonStyleAsync("dark");
-  }, []);
+    NavigationBar.setButtonStyleAsync(DarkMode ? "light" : "dark");
+  }, [DarkMode]);
   return (
     <>
-      <StatusBar style="dark" />
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>
-        <AppProvider>
-          <Stack
-            screenOptions={{
-              headerStyle: {
-                // height: 100
-                // headerHeight: 00,
-                // backgroundColor: "transparent"
+      <StatusBar style={DarkMode ? "light" : "dark"} />
+      <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+        <Stack
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: theme.background,
+             
+            },
+         
+          }}
+        >
+          <Stack.Screen name="(tabs)" 
+          options={{
+             headerShown: false ,
+             headerTitleAlign: "left",
+             }} />
+          <Stack.Screen
+            name="settingsScreen"
+            options={{
+              title: "Settings",
+              headerTitleAlign: "left",
+              headerTitleStyle: {
+                fontSize: 30,
+                
+               
               },
-              // headerShadowVisible: false,
+               headerTintColor: theme.text,
+              
             }}
-          >
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="settingsScreen"
-              options={{
-                title: "Settings",
-                headerTitleAlign: "center",
-                headerStyle: {
-                  backgroundColor: "#f5f5f5",
-                  // headerHeight: 100,
-                },
-                headerTitleStyle: {
-                  fontSize: 25,
-                },
-              }}
-            />
-          </Stack>
-        </AppProvider>
+          />
+        </Stack>
       </SafeAreaView>
     </>
   );

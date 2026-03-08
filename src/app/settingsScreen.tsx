@@ -2,7 +2,7 @@ import { AppContext } from "@/context/AppContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import React, { useContext, useCallback, useEffect, useState } from "react";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 import {
   Alert,
   Linking,
@@ -11,8 +11,9 @@ import {
   Text,
   Vibration,
   View,
-  Image
+  Image,
 } from "react-native";
+import { darkTheme, lightTheme } from "@/theme";
 
 export default function settingsScreen() {
   const {
@@ -20,8 +21,8 @@ export default function settingsScreen() {
     setsecondsOn,
     value,
     setValue,
-    Darkmode,
-    setDarkmode,
+    DarkMode,
+    setDarkMode,
     currentStreak,
     setcurrentStreak,
     bestDayTime,
@@ -32,8 +33,12 @@ export default function settingsScreen() {
     setisFireActive,
     isInitialized,
     setIsInitialized,
-    fetchSecondsShowState
+    fetchSecondsShowState,
+    isDarkInitialized,
+    setIsDarkInitialized,
   } = useContext(AppContext);
+
+  const theme = DarkMode ? darkTheme : lightTheme;
 
   const triggerHaptic = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -74,6 +79,9 @@ export default function settingsScreen() {
       await AsyncStorage.removeItem("streakDate");
       await AsyncStorage.removeItem("longestStreak");
       await AsyncStorage.removeItem("bestDayTime");
+      await AsyncStorage.removeItem("secondsOn");
+      await AsyncStorage.removeItem("darkState");
+      await AsyncStorage.removeItem("todayDate");
     } catch (error) {
       console.error("Error clearing data:", error);
     }
@@ -103,6 +111,21 @@ export default function settingsScreen() {
       console.error("Error saving secondsOn state:", error);
     }
   };
+  const saveDarkState = async () => {
+    try {
+      await AsyncStorage.setItem("darkState", JSON.stringify(DarkMode));
+    } catch (error) {
+      console.error("Error saving dark state:", error);
+    }
+  };
+
+  //saving darkmode state
+  useEffect(() => {
+    if (isDarkInitialized) {
+      saveDarkState();
+    }
+  }, [DarkMode, isDarkInitialized]);
+  
 
   // saving secondsstate
   useEffect(() => {
@@ -112,11 +135,11 @@ export default function settingsScreen() {
   }, [secondsOn, isInitialized]);
 
   //  fetching seconds when screen is focused using useFocusEffect
-  useFocusEffect(
-    useCallback(() => {
-      fetchSecondsShowState();
-    }, [fetchSecondsShowState])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     fetchSecondsShowState();
+  //   }, [fetchSecondsShowState]),
+  // );
 
   const toggleSecondsOn = () => {
     setsecondsOn(true);
@@ -128,29 +151,25 @@ export default function settingsScreen() {
   // darkmode
 
   const toggleDarkModeOn = () => {
-    // setDarkmode(true);
-    alert(
-      "Dark mode is currently in development and may not work as expected. We appreciate your patience as we work to improve this feature.",
-    );
+    setDarkMode(true);
   };
   const toggleDarkModeOff = () => {
-    setDarkmode(false);
+    setDarkMode(false);
   };
 
   // darkmode
-
 
   return (
     <>
       {/* <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }}> */}
 
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
         <View
           style={{
             flexDirection: "column",
             alignItems: "center",
-            gap: 5,
-            width: "90%",
+            gap: 10,
+            width: "95%",
           }}
         >
           <Pressable
@@ -163,6 +182,7 @@ export default function settingsScreen() {
               paddingVertical: 10,
               paddingHorizontal: 20,
               width: "100%",
+              marginBottom: 10,
               justifyContent: "center",
               alignItems: "center",
             }}
@@ -174,9 +194,11 @@ export default function settingsScreen() {
             />
           </Pressable>
 
-          <View style={styles.settingitem}>
-            <Text>SHOW SECONDS</Text>
-            <View style={styles.button}>
+          <View
+            style={[styles.settingitem, { backgroundColor: theme.cardColor }]}
+          >
+            <Text style={[{ color: theme.text },styles.label]}>Show Seconds</Text>
+            <View style={[styles.button, { borderColor: theme.secondaryText }]}>
               <Pressable
                 onPress={() => {
                   toggleSecondsOn();
@@ -187,7 +209,7 @@ export default function settingsScreen() {
                   { backgroundColor: secondsOn ? "#FF6347" : "transparent" },
                 ]}
               >
-                <Text>ON</Text>
+                <Text style={{ color: theme.text,fontWeight:"bold" }}>ON</Text>
               </Pressable>
               <Pressable
                 onPress={() => {
@@ -199,26 +221,18 @@ export default function settingsScreen() {
                   { backgroundColor: secondsOn ? "transparent" : "#FF6347" },
                 ]}
               >
-                <Text>OFF</Text>
+                <Text style={{ color: theme.text,fontWeight:"bold" }}>OFF</Text>
               </Pressable>
             </View>
           </View>
 
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: "black",
-              width: "100%",
-              marginTop: 15,
-            }}
-          ></View>
-          <Text style={{ marginBottom: 15 }}>coming soon...</Text>
-
           {/* // this is for darkmode button */}
 
-          <View style={styles.settingitem}>
-            <Text>DARK MODE</Text>
-            <View style={styles.button}>
+          <View
+            style={[styles.settingitem, { backgroundColor: theme.cardColor }]}
+          >
+            <Text style={[{ color: theme.text },styles.label]}>Dark Mode</Text>
+            <View style={[styles.button, { borderColor: theme.secondaryText }]}>
               <Pressable
                 onPress={() => {
                   toggleDarkModeOn();
@@ -226,10 +240,10 @@ export default function settingsScreen() {
                 }}
                 style={[
                   styles.switch,
-                  { backgroundColor: Darkmode ? "#FF6347" : "transparent" },
+                  { backgroundColor: DarkMode ? "#FF6347" : "transparent" },
                 ]}
               >
-                <Text>ON</Text>
+                <Text style={{ color: theme.text,fontWeight:"bold" }}>ON</Text>
               </Pressable>
               <Pressable
                 onPress={() => {
@@ -238,31 +252,51 @@ export default function settingsScreen() {
                 }}
                 style={[
                   styles.switch,
-                  { backgroundColor: Darkmode ? "transparent" : "#FF6347" },
+                  { backgroundColor: DarkMode ? "transparent" : "#FF6347" },
                 ]}
               >
-                <Text>OFF</Text>
+                <Text style={{ color: theme.text,fontWeight:"bold" }}>OFF</Text>
               </Pressable>
             </View>
           </View>
+         
 
-          <View style={styles.settingitem}>
-            <Text>streak update if</Text>
+     
+
+
+          <View
+            style={[styles.settingitem, { backgroundColor: theme.cardColor }]}
+            >
+            <Text style={[{ color: theme.text },styles.label]}>streak update if</Text>
             <Pressable
               onPress={() => {
                 alert("custom time currently in development");
               }}
             >
-              <Text style={styles.input}> {">1 hour"}/day</Text>
+              <Text
+                style={[
+                  styles.input,
+                  { color: theme.text,fontWeight:"bold",borderColor: theme.secondaryText },
+                ]}
+              >
+                
+                {">1 hour"}/day
+              </Text>
             </Pressable>
           </View>
+             
 
-          {/* dark mode button end */}
+        
         </View>
 
-        <View style={styles.resetButtonContainer}>
+        <View
+          style={[
+            styles.resetButtonContainer,
+            { backgroundColor: theme.cardColor },
+          ]}
+        >
           <Pressable onPress={confirmAction}>
-            <Text style={{ fontSize: 20 }}>reset stats</Text>
+            <Text style={{ fontSize: 20, color: theme.text ,fontWeight:"bold"}}>reset stats</Text>
           </Pressable>
         </View>
       </View>
@@ -279,16 +313,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
   },
+  label:{
+    fontWeight:"bold",
+    fontSize:18,
+
+  },
   settingitem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     gap: 20,
     width: "100%",
-    paddingHorizontal: "10%",
-    paddingVertical: "5%",
+    paddingHorizontal: "7%",
+    // paddingVertical: "5%",
     backgroundColor: "white",
-    borderRadius: 15,
+    borderRadius: 28,
+    height: 95,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 5,
+    shadowOffset: { width: 0, height: 8 },
   },
   input: {
     fontSize: 14,
@@ -336,4 +381,5 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     // backgroundColor: "#FF6347",
   },
+
 });

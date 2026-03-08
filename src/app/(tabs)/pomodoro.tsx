@@ -8,19 +8,31 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, Vibration, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
+import { darkTheme, lightTheme } from "@/theme";
 
 export default function Index() {
-  const { secondsOn } = useContext(AppContext);
-  const { value, setValue } = useContext(AppContext);
+  const {
+    secondsOn,
+    value,
+    setValue,
+    hideStatusbar,
+    sethideStatusbar,
+    DarkMode,
+  } = useContext(AppContext);
+
   const [isTimerOn, setIsTimerOn] = useState(false);
   const [Timer, setTimer] = useState(1500);
   const [breakTime, setbreakTime] = useState(300);
+  const timerStartRef = useRef<number | null>(null);
+  const breakStartRef = useRef<number | null>(null);
+  const storedElapsedTimeRef = useRef(0);
   const [isBreakOn, setisBreakOn] = useState(false);
   const [isBreakShow, setisBreakShow] = useState(false);
   const [isTimerShow, setisTimerShow] = useState(true);
-  const { hideStatusbar, sethideStatusbar } = useContext(AppContext);
   const [showOverlay, setShowOverlay] = useState(false);
   const [showbreakOverlay, setShowbreakOverlay] = useState(false);
+
+  const theme = DarkMode ? darkTheme : lightTheme;
 
   // testing haptics
 
@@ -100,18 +112,12 @@ export default function Index() {
             await AsyncStorage.setItem("todayData", todayvalue);
           } else {
             todayvalue = JSON.stringify(timePassedRef.current);
-            await AsyncStorage.setItem(
-              "todayData",
-              todayvalue,
-            );
+            await AsyncStorage.setItem("todayData", todayvalue);
             await AsyncStorage.setItem("todayDate", today.toISOString());
           }
         } else {
           todayvalue = JSON.stringify(timePassedRef.current);
-          await AsyncStorage.setItem(
-            "todayData",
-            todayvalue,
-          );
+          await AsyncStorage.setItem("todayData", todayvalue);
           await AsyncStorage.setItem("todayDate", today.toISOString());
         }
 
@@ -164,22 +170,39 @@ export default function Index() {
       sethideStatusbar(false);
 
       setbreakTime(300);
+        storedElapsedTimeRef.current=0;
     }
     if (isTimerShow) {
       setIsTimerOn(false);
       sethideStatusbar(false);
       setTimer(1500);
       timePassedRef.current = 0;
+      storedElapsedTimeRef.current = 0;
     }
   };
 
   const buttonPressed = () => {
     if (isTimerShow) {
-      setIsTimerOn(!isTimerOn);
+      if (!isTimerOn) {
+        timerStartRef.current = Date.now();
+
+        setIsTimerOn(true);
+      } else {
+        setIsTimerOn(false);
+        timerStartRef.current = null;
+        storedElapsedTimeRef.current = timePassedRef.current;
+      }
       sethideStatusbar(!hideStatusbar);
     }
     if (isBreakShow) {
-      setisBreakOn(!isBreakOn);
+      if (!isBreakOn) {
+        breakStartRef.current = Date.now();
+        setisBreakOn(true);
+      } else {
+        setisBreakOn(false);
+        breakStartRef.current = null;
+        storedElapsedTimeRef.current=300-breakTime;
+      }
       sethideStatusbar(!hideStatusbar);
     }
   };
@@ -189,28 +212,34 @@ export default function Index() {
   useEffect(() => {
     if (isTimerOn) {
       const timer = setInterval(() => {
-        setTimer((prev) => {
-          if (prev <=0) {
+        if (timerStartRef.current !== null) {
+          const elapsed = Math.floor(
+            (Date.now() - timerStartRef.current) / 1000,
+          );
+          timePassedRef.current =storedElapsedTimeRef.current+ elapsed;
+          
+
+      
+          //with every pause the timerstartref.current is beign set to null and then its again recalculatign form the start to everypause behaves like a restart need to fix it
+
+          const remaining = 1500 - timePassedRef.current;
+
+
+          setTimer(remaining > 0 ? remaining : 0);
+          if (remaining <= 0) {
             timerFinishedVibrate();
             triggerOverlay();
             clearInterval(timer);
             setisBreakShow(true);
             setisTimerShow(false);
-            // setisBreakOn(true);
             setIsTimerOn(false);
-            // sethideStatusbar(!hideStatusbar);
-            // setisBreakOn(true);
-
+            setTimer(1500);
             saveObject();
-
-            return 1500;
+            timerStartRef.current = null;
+            storedElapsedTimeRef.current = 0;
           }
-          return prev - 1;
-        });
-
-        timePassedRef.current += 1;
+        }
       }, 1000);
-
       return () => clearInterval(timer);
     }
   }, [isTimerOn]);
@@ -218,30 +247,67 @@ export default function Index() {
   useEffect(() => {
     if (isBreakOn) {
       const timer = setInterval(() => {
-        setbreakTime((prev) => {
-          if (prev <= 0) {
+        if (breakStartRef.current !== null) {
+          const elapsed = Math.floor(
+            (Date.now() - breakStartRef.current) / 1000,
+          );
+
+          const remaining = 300 - (storedElapsedTimeRef.current+elapsed);
+          setbreakTime(remaining > 0 ? remaining : 0);
+          if (remaining <= 0) {
             clearInterval(timer);
-            // triggerOverlay();
             triggerBreakOverlay();
             setisBreakOn(false);
             setisBreakShow(false);
             setisTimerShow(true);
+            setbreakTime(300);
             timerFinishedVibrate();
-            return 300;
+            breakStartRef.current = null;
+             storedElapsedTimeRef.current=0;
           }
-          return prev - 1;
-        });
+        }
       }, 1000);
-
       return () => clearInterval(timer);
     }
   }, [isBreakOn]);
 
+  // --- Customizable variables for SVG and timer ---
+  const OUTER_CIRCLE_SIZE = 400;
+  const OUTER_CIRCLE_RADIUS = 150;
+  const OUTER_CIRCLE_STROKE = 12;
+  const OUTER_CIRCLE_COLOR = "#f96767";
+  const OUTER_CIRCLE_OPACITY = 0.2;
+
+  const INNER_CIRCLE_SIZE = 400;
+  const INNER_CIRCLE_RADIUS = 150;
+  const INNER_CIRCLE_STROKE = 20;
+  const INNER_CIRCLE_COLOR_DARK = "#f7797d";
+  // const INNER_CIRCLE_COLOR_DARK = "rgba(74,222,128,0.08)";
+  const INNER_CIRCLE_COLOR_LIGHT = "#fc6767";
+  const INNER_CIRCLE_ROTATION = -90;
+  const INNER_CIRCLE_STROKE_CAP = "round";
+
+  const TIMER_TOTAL_SECONDS = 1500; // 25 min
+  const BREAK_TOTAL_SECONDS = 300; // 5 min
+
   return (
     <>
-      <View style={styles.container}>
-        <Settings />
-        <Streak params={false} />
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        {!isTimerOn && (
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              width: "100%",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              padding: 30,
+            }}
+          >
+            <Streak params={false} />
+            <Settings />
+          </View>
+        )}
 
         {/* overlay on break over */}
 
@@ -251,9 +317,11 @@ export default function Index() {
               setShowbreakOverlay(false);
               Vibration.cancel();
             }}
-            style={styles.overlay}
+            style={[styles.overlay,{backgroundColor:DarkMode?"white":"black"}]}
           >
-            <Text style={styles.overlayText}> Session Complete</Text>
+            <Text style={[styles.overlayText, { color: DarkMode? "black":"white" }]}>
+              Break Time Over
+            </Text>
           </Pressable>
         )}
 
@@ -267,9 +335,11 @@ export default function Index() {
               setShowOverlay(false);
               Vibration.cancel();
             }}
-            style={styles.overlay}
+            style={[styles.overlay,{backgroundColor:DarkMode?"white":"black"}]}
           >
-            <Text style={styles.overlayText}> Session Complete</Text>
+            <Text style={[styles.overlayText, { color: DarkMode? "black":"white" }]}>
+              Session Complete
+            </Text>
           </Pressable>
         )}
         {/* overlay on timer over */}
@@ -283,18 +353,18 @@ export default function Index() {
                 position: "absolute",
               }}
             >
-              <Svg width={300} height={300}>
+              <Svg width={OUTER_CIRCLE_SIZE} height={OUTER_CIRCLE_SIZE}>
                 <Circle
-                  cx="150"
-                  cy="150"
-                  r="130"
-                  originX={150}
-                  originY={150}
-                  stroke="#ff6f6f"
-                  opacity={0.2}
-                  strokeWidth="10"
+                  cx={OUTER_CIRCLE_SIZE / 2}
+                  cy={OUTER_CIRCLE_SIZE / 2}
+                  r={OUTER_CIRCLE_RADIUS}
+                  originX={OUTER_CIRCLE_SIZE / 2}
+                  originY={OUTER_CIRCLE_SIZE / 2}
+                  stroke={OUTER_CIRCLE_COLOR}
+                  opacity={OUTER_CIRCLE_OPACITY}
+                  strokeWidth={OUTER_CIRCLE_STROKE}
                   fill="none"
-                  rotation="-90"
+                  rotation={INNER_CIRCLE_ROTATION}
                 />
               </Svg>
             </View>
@@ -304,23 +374,29 @@ export default function Index() {
                 position: "absolute",
               }}
             >
-              <Svg width={300} height={300}>
+              <Svg width={INNER_CIRCLE_SIZE} height={INNER_CIRCLE_SIZE}>
                 <Circle
-                  cx="150"
-                  cy="150"
-                  r="130"
-                  originX={150}
-                  originY={150}
-                  stroke="#ff6f6f"
-                  strokeWidth="15"
-                  strokeLinecap="round"
+                  cx={INNER_CIRCLE_SIZE / 2}
+                  cy={INNER_CIRCLE_SIZE / 2}
+                  r={INNER_CIRCLE_RADIUS}
+                  originX={INNER_CIRCLE_SIZE / 2}
+                  originY={INNER_CIRCLE_SIZE / 2}
+                  stroke={
+                    DarkMode
+                      ? INNER_CIRCLE_COLOR_DARK
+                      : INNER_CIRCLE_COLOR_LIGHT
+                  }
+                  strokeWidth={INNER_CIRCLE_STROKE}
+                  strokeLinecap={INNER_CIRCLE_STROKE_CAP}
                   fill="none"
-                  rotation="-90"
-                  strokeDasharray={`${Math.PI * 2 * 130}`}
-                  strokeDashoffset={`${Math.PI * 2 * 130 - (Math.PI * 2 * 130 * timePassedRef.current) / 1500}`}
+                  rotation={INNER_CIRCLE_ROTATION}
+                  strokeDasharray={`${Math.PI * 2 * INNER_CIRCLE_RADIUS}`}
+                  strokeDashoffset={`${Math.PI * 2 * INNER_CIRCLE_RADIUS - (Math.PI * 2 * INNER_CIRCLE_RADIUS * timePassedRef.current) / TIMER_TOTAL_SECONDS}`}
                 />
               </Svg>
             </View>
+
+           
           </View>
         )}
         {/* svg circle */}
@@ -334,6 +410,7 @@ export default function Index() {
                     fontSize: 24,
                     alignSelf: "center",
                     position: "absolute",
+                    color: theme.secondaryText,
                     top: -250,
                   }}
                 >
@@ -343,7 +420,7 @@ export default function Index() {
                 </Text>
               )}
               {secondsOn && (
-                <Text style={styles.time}>
+                <Text style={[styles.time, { color: theme.text }]}>
                   {Timer < 60
                     ? `${Timer.toString().padStart(2, "0")} `
                     : Timer >= 3600
@@ -359,7 +436,7 @@ export default function Index() {
                 </Text>
               )}
               {!secondsOn && (
-                <Text style={styles.time}>
+                <Text style={[styles.time, { color: theme.text }]}>
                   {Timer < 60
                     ? `00`
                     : Timer >= 3600
@@ -384,25 +461,25 @@ export default function Index() {
                   marginBottom: 10,
                   position: "absolute",
                   top: -250,
+                  color: theme.secondaryText,
                 }}
               >
                 Break Time!
               </Text>
               <View>
                 {secondsOn && (
-                  <Text style={styles.time}>
+                  <Text style={[styles.time,{color:theme.text}]}>
                     {breakTime < 60
                       ? `${breakTime.toString().padStart(2, "0")} `
                       : `${Math.floor(breakTime / 60)}:${(breakTime % 60).toString().padStart(2, "0")}`}
                   </Text>
                 )}
                 {!secondsOn && (
-                  <Text style={styles.time}>
+                <Text style={[styles.time,{color:theme.text}]}>
                     {breakTime < 60
                       ? `00`
                       : `${Math.floor(breakTime / 60)
-                          .toString()
-                          .padStart(2, "0")}`}
+                          }`}
                   </Text>
                 )}
               </View>
@@ -419,6 +496,9 @@ export default function Index() {
               }}
               style={[
                 isTimerOn || isBreakOn ? styles.pauseButton : styles.button,
+                isTimerOn || isBreakOn
+                  ? { backgroundColor: theme.primary }
+                  : { backgroundColor: theme.onbutton },
               ]}
             >
               <Text style={styles.buttonText}>
@@ -437,10 +517,12 @@ export default function Index() {
                   doSkip();
                   triggerHaptic();
                 }}
-                style={styles.skipButton}
+                style={[styles.skipButton, { borderColor: theme.primary }]}
               >
-                {isBreakShow && <Text>Skip</Text>}
-                {(isTimerOn || Timer < 1500) && <Text>Give Up</Text>}
+                {isBreakShow && <Text style={{ color: theme.text }}>Skip</Text>}
+                {(isTimerOn || Timer < 1500) && (
+                  <Text style={{ color: theme.text }}>Give Up</Text>
+                )}
               </Pressable>
             </View>
           )}
@@ -471,15 +553,17 @@ const styles = StyleSheet.create({
     // flex:1,
     width: "100%",
     height: "100%",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    opacity: 0.9,
+    
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1,
   },
   overlayText: {
     position: "relative",
-    top: -50,
-    fontSize: 32,
+    zIndex: 5,
+    top: -100,
+    fontSize: 40,
     fontWeight: "bold",
     color: "white",
     // backgroundColor: "rgba(0,0,0,0.7)",
@@ -490,9 +574,10 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
   },
   time: {
-    fontSize: 70,
+    fontSize: 80,
     bottom: 30,
-    // fontWeight: "bold",
+
+    fontWeight: "bold",
     color: "black",
   },
 

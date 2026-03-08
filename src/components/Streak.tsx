@@ -6,11 +6,14 @@ import React, { useCallback, useContext, useEffect } from "react";
 import { Text, View } from "react-native";
 import activeStreak from "../UIassets/streakActive.png";
 import inactiveStreak from "../UIassets/streakInactive.png";
+import { darkTheme,lightTheme } from "@/theme";
 
 const Streak = ({ params }: { params: boolean }) => {
   const { currentStreak, setcurrentStreak } = useContext(AppContext);
   const { value, setValue } = useContext(AppContext);
   const { isFireActive, setisFireActive } = useContext(AppContext);
+  const {DarkMode} = useContext(AppContext);
+  const theme = DarkMode ? darkTheme : lightTheme;
 
   // Helper to calculate days between two dates
   const getDaysDiff = (date1: Date, date2: Date): number => {
@@ -209,38 +212,38 @@ const Streak = ({ params }: { params: boolean }) => {
   return (
     <View
       style={{
-        position: "absolute",
-        top: 50,
-        left: 25,
-        height: 30,
-        width: 30,
-        gap: 5,
+        height: 40,
+        width: 50,
+ 
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
       }}
     >
-      <View
+      {/* <View
         style={{
-          alignItems: "center",
-          justifyContent: "center",
           flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
         }}
-      >
+      > */}
         <Image
           source={isFireActive ? activeStreak : inactiveStreak}
-          style={{ height: 30, width: 30 }}
+          style={{ height: 30, width: 30 , tintColor: !isFireActive ?  theme.secondaryText:undefined }}
         />
         <Text
           style={{
-            color: "black",
-            textAlign: "center",
+            color: theme.secondaryText,
+            // textAlign: "center",
             fontWeight: "bold",
-            fontSize: 25,
+            fontSize: 32,
           }}
         >
-          {isFireActive || params ? currentStreak : currentStreak + 1}
-          {!isFireActive && !params ? "?" : null}
+          {currentStreak }
+          {!isFireActive && !params && currentStreak==0 ? "?" : null}
         </Text>
       </View>
-    </View>
+    // </View>
   );
 };
 
