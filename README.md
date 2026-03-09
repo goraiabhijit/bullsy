@@ -59,6 +59,29 @@ Build daily habits, track your focus sessions, and stay consistent.
 
 ---
 
+
+---
+
+## 🛠️ Tech Stack
+
+- **React Native** — Cross-platform mobile app framework
+- **Expo** — Streamlined development and build tools for React Native
+- **AsyncStorage** — Local data storage for saving user stats and settings
+
+---
+
 ## 🙋 About
 
 Made by **Abhijit Gorai**
+
+---
+
+## 🙌 About This Project
+
+Bullsy is an open-source, minimalist Pomodoro and focus timer app designed to help you build better habits, track your productivity, and stay consistent. This free version is the core of the full Bullsy experience, available on the Play Store.
+
+### Contact
+- Twitter: [@gorai_abhijit_](https://twitter.com/gorai_abhijit_)
+
+
+If you find this project helpful, consider supporting via [Buy Me a Coffee](https://buymeacoffee.com/gorai_abhijit_).
