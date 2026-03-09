@@ -54,7 +54,7 @@ Build daily habits, track your focus sessions, and stay consistent.
 ## 📱 Download
 
 <a href="https://play.google.com/store/apps/details?id=io.github.goraiabhijit.bullsy" target="_blank">
-  <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="50" />
+  <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="60" />
 </a>
 
 ---
