@@ -28,6 +28,7 @@ function InnerLayout() {
           screenOptions={{
             headerStyle: {
               backgroundColor: theme.background,
+             
             },
           }}
         >
@@ -35,18 +36,20 @@ function InnerLayout() {
             name="(tabs)"
             options={{
               headerShown: false,
-          
             }}
           />
+
           <Stack.Screen
             name="settingsScreen"
             options={{
+              
               title: "Settings",
               headerTitleAlign: "center",
               headerTitleStyle: {
                 fontSize: 30,
               },
               headerTintColor: theme.text,
+              // headerShadowVisible: false,
             }}
           />
         </Stack>

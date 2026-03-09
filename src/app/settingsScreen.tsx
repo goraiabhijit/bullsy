@@ -195,7 +195,7 @@ export default function settingsScreen() {
           </Pressable>
 
           <View
-            style={[styles.settingitem, { backgroundColor: theme.cardColor }]}
+            style={[styles.settingitem, { backgroundColor: theme.cardColor ,elevation:DarkMode?10:3}]}
           >
             <Text style={[{ color: theme.text },styles.label]}>Show Seconds</Text>
             <View style={[styles.button, { borderColor: theme.secondaryText }]}>
@@ -229,7 +229,7 @@ export default function settingsScreen() {
           {/* // this is for darkmode button */}
 
           <View
-            style={[styles.settingitem, { backgroundColor: theme.cardColor }]}
+            style={[styles.settingitem, { backgroundColor: theme.cardColor ,elevation:DarkMode?10:3}]}
           >
             <Text style={[{ color: theme.text },styles.label]}>Dark Mode</Text>
             <View style={[styles.button, { borderColor: theme.secondaryText }]}>
@@ -265,7 +265,7 @@ export default function settingsScreen() {
 
 
           <View
-            style={[styles.settingitem, { backgroundColor: theme.cardColor }]}
+            style={[styles.settingitem, { backgroundColor: theme.cardColor,elevation:DarkMode?10:3 }]}
             >
             <Text style={[{ color: theme.text },styles.label]}>streak update if</Text>
             <Pressable

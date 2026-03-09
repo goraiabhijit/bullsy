@@ -11,7 +11,7 @@
       "icon": "./assets/images/icon.png"
     },
     "android": {
-      "versionCode": 6,
+      "versionCode": 5,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",

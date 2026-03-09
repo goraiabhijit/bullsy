@@ -41,7 +41,7 @@ export default function TabLayout() {
             // borderTopColor:"#a7bfe0",
 
             height: 75,
-            elevation: DarkMode ? 10 : 7, // Android shadow
+            elevation: DarkMode ? 10 : 5.5, // Android shadow
             shadowColor: "#000", // iOS shadow
 
             shadowOffset: { width: 0, height: 4 },

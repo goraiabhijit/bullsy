@@ -140,7 +140,7 @@ export default function history() {
           <Settings />
 
         </View>
-      <View style={[styles.box,{backgroundColor:theme.cardColor}]}>
+      <View style={[styles.box,{backgroundColor:theme.cardColor,elevation:DarkMode?10:3}]}>
         <View
           style={{
             flexDirection: "row",
@@ -178,7 +178,7 @@ export default function history() {
         </View>
       </View>
 
-         <View style={[styles.box,{backgroundColor:theme.cardColor}]}>
+         <View style={[styles.box,{backgroundColor:theme.cardColor,elevation:DarkMode?10:3}]}>
         <Text style={{ marginBottom: 10 ,color:theme.text}}>Life Time</Text>
         <Text style={{ fontSize: 32, fontWeight: "bold", textAlign: "center" ,color:theme.text }}>
           {Time < 60
@@ -195,13 +195,13 @@ export default function history() {
           justifyContent: "space-between",
         }}
       >
-            <View style={[styles.streakbox,{backgroundColor:theme.cardColor}]}>
+            <View style={[styles.streakbox,{backgroundColor:theme.cardColor,elevation:DarkMode?10:3}]}>
           <Text style={{ marginBottom: 10 ,color:theme.text}}>CurrentStreak</Text>
           <View style={{  marginBottom: 0}}>
             <Streak params={isFocused} />
           </View>
         </View>
-        <View style={[styles.streakbox,{backgroundColor:theme.cardColor}]}>
+        <View style={[styles.streakbox,{backgroundColor:theme.cardColor,elevation:DarkMode?10:3}]}>
           <Text style={{ marginBottom: 10 ,color:theme.text}}>Longest Streak</Text>
           <View
             style={{
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
    shadowColor: "#000",
     shadowOpacity: 0.3,
     shadowRadius: 12,
-    elevation: 7,
+    elevation: 3,
     shadowOffset: { width: 0, height: 8 },
 
 
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
    shadowOpacity: 0.3,
     shadowRadius: 12,
-    elevation: 7,
+    elevation: 3,
     shadowOffset: { width: 0, height: 8 },
     alignItems: "center",
     justifyContent: "center",
