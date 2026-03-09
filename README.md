@@ -20,6 +20,15 @@ Build daily habits, track your focus sessions, and stay consistent.
 
 </div>
 
+> **This is the core open-source free version of Bullsy Pomodoro Study Timer.**  
+> Download the full version:
+
+<div align="center">
+  <a href="https://play.google.com/store/apps/details?id=io.github.goraiabhijit.bullsy" target="_blank">
+    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80" />
+  </a>
+</div>
+
 ---
 
 ## ✨ Features
@@ -44,7 +53,7 @@ Build daily habits, track your focus sessions, and stay consistent.
 
 ## 📱 Download
 
-Coming soon on **Google Play**.
+[![Get it on Google Play](https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=io.github.goraiabhijit.bullsy)
 
 ---
 
